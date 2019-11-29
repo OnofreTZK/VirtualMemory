@@ -40,6 +40,7 @@ first-in first-out - 'fifo'\n""")
         print("Por favor, informe um tamanho de página entre 2kB e 64kB\n")
         sys.exit(1)
 
+     # Getting memory size   
     if int(lista[4]) >= 128 and int(lista[4]) <= 16384 :
         memory_size = lista[4]
     else :
