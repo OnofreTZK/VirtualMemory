@@ -33,7 +33,7 @@ filepath, page_size, memory_size, PRA = processing_args( sys.argv, filepath, pag
 #-------------------------------- Reading data --------------------------------------#
 
 # Memory object instantiation
-CACHE = Memory( memory_size, memory_size, PRA )
+CACHE = Memory( memory_size, page_size, PRA )
 
 adresses = CACHE.parser( filepath )
 
