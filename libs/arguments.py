@@ -5,6 +5,20 @@ import sys
 
 def processing_args( lista, filename, page_size, memory_size, PRA ) :
     "Processing arguments"
+
+    if( len(lista) < 5 or len(lista) > 5 ):
+        print("""Argumentos inválidos! Por favor informe na seguinte ordem:
+
+\033[34m<algoritmo_de_substituição>:\033[0m
+last recent used - 'lru'
+full random = 'random'
+first-in first-out - 'fifo'
+
+\033[34m<arquivo_com_os_endereços>\033[0m: informe o caminho caso necessário
+\033[34m<tamanho_da_pagina>\033[0m: entre 2kB e 64kB
+\033[34m<tamanho_da_memória\033[0m: entre 128kB e 16384kB\n""")
+        sys.exit(1)
+
     # Getting filename
     if '.log' in lista[2] or '.txt' in lista[2] :
         filename = lista[2]
