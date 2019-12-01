@@ -35,8 +35,11 @@ filepath, page_size, memory_size, PRA = processing_args( sys.argv, filepath, pag
 # Memory object instantiation
 VIRTUAL = Memory( memory_size, page_size, PRA )
 
+# "Creating" a cache after parse the adresses
 CACHE = VIRTUAL.parser( filepath )
 
+# Simulation sain processes( memory management and page replacement )
 VIRTUAL.simulate( CACHE )
 
+# Print log with results.
 VIRTUAL.report()
