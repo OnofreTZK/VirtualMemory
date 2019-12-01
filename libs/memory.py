@@ -4,10 +4,13 @@ from .global_var import *
 from dataclasses import dataclass
 
 # Queue for FIFO
-import queue
+from queue import SimpleQueue
 
 # To save current time
 from time import time
+
+# Random replacement
+from random import choice
 
 #---------------------------#
 @dataclass
@@ -78,6 +81,9 @@ class Memory(object) :
     def _search_in_virtual_( self, adress ): #{{{
         """ Search adress in memory slot """
 
+        # Memory access: search adress
+        self.access_count += 1
+
         # Dictionary case
         # In this case the data is a struct page and key is time.
         if self.ALGORITHM == PRA_LRU :
@@ -102,7 +108,7 @@ class Memory(object) :
         """ First In First Out replacement """
 
         # Queue of entrance
-        first_order = queue.SimpleQueue()
+        first_order = SimpleQueue()
 
         virtualIndex =0
 
@@ -114,9 +120,16 @@ class Memory(object) :
                     # Put in memory in place of the first one entered in memory
                     first_out_page = first_order.get() # removing
                     self.slot[first_out_page.index] = PAGE( first_out_page.index, CACHE[i], time() )
+                    # access memory: replace
+                    self.access_count += 1
+
                     # adding the page in fifo queue
                     first_order.put( self.slot[first_out_page.index] )
+                    #print memory status in terminal
+                    self.printer(True, CACHE[i])
                 else:
+                    #print memory status in terminal
+                    self.printer(False, CACHE[i])
                     continue
 
             else: # Empty memory
@@ -128,7 +141,14 @@ class Memory(object) :
                     first_order.put( self.slot[virtualIndex] )
                     # increment memory index
                     virtualIndex += 1
+                    # access memory: replace
+                    self.access_count += 1
+
+                    #print memory status in terminal
+                    self.printer(True, CACHE[i])
                 else:
+                    #print memory status in terminal
+                    self.printer(False, CACHE[i])
                     continue
 
     #}}}
@@ -149,6 +169,11 @@ class Memory(object) :
                     # adding new page
                     newTime = time()
                     self.slot[newTime] = PAGE( least_one_index, CACHE[i], newTime )
+                    # access memory: replace
+                    self.access_count += 1
+
+                    #print memory status in terminal
+                    self.printer(True, CACHE[i])
                 else:
                     # the adress already exist!
                     # so we need update your time reference
@@ -161,6 +186,8 @@ class Memory(object) :
                     # updating time
                     self.slot[newTime] = self.slot.pop(oldTime)
                     self.slot[newTime].time = newTime
+                    #print memory status in terminal
+                    self.printer(False, CACHE[i])
             else:
 
                 if self._search_in_virtual_( CACHE[i] ) is not True :
@@ -168,6 +195,11 @@ class Memory(object) :
                     # So the DS used is is dict with epoch time as key's
                     newTime = time()
                     self.slot[newTime] = PAGE( i+1, CACHE[i], newTime )
+                    # access memory: replace
+                    self.access_count += 1
+
+                    #print memory status in terminal
+                    self.printer(True, CACHE[i])
                 else:
                     # the adress already exist!
                     # so we need update your time reference
@@ -180,7 +212,43 @@ class Memory(object) :
                     # updating time
                     self.slot[newTime] = self.slot.pop(oldTime)
                     self.slot[newTime].time = newTime
+                    #print memory status in terminal
+                    self.printer(False, CACHE[i])
 
+
+#------------------------------------------------------------------------------------------------#
+
+    def RANDOM( self, CACHE ): #{{{
+        """ Random replacement """
+
+        for i in range( len(CACHE) ):
+            if i >= self.slot_Space:
+                if self._search_in_virtual_( CACHE[i] ) is not True :
+                    # Random choice to out
+                    chosen_random = choice(self.slot)
+                    # Subscript the chosen
+                    self.slot[chosen_random.index] = PAGE( chosen_random.index, CACHE[i], time() )
+                    # access memory: replace
+                    self.access_count += 1
+
+                    # Print memory status in terminal
+                    self.printer(True, CACHE[i])
+                else:
+                    #print memory status in terminal
+                    self.printer(False, CACHE[i])
+                    continue
+            else:
+                if self._search_in_virtual_( CACHE[i] ) is not True :
+                    self.slot.append( PAGE( i, CACHE[i], time() ) )
+                    # access memory: replace
+                    self.access_count += 1
+
+                    #print memory status in terminal
+                    self.printer(True, CACHE[i])
+                else:
+                    #print memory status in terminal
+                    self.printer(False, CACHE[I])
+                    continue
 
 
 
@@ -194,11 +262,38 @@ class Memory(object) :
         elif self.ALGORITHM == PRA_LRU:
             self.LRU( CACHE )
         else:
-            b
-            #not yet
+            self.RANDOM( CACHE )
 
 
     #}}}
+
+#------------------------------------------------------------------------------------------------#
+    def printer( self, FLAG, adress ): #{{{
+        """ Print Memory status """
+
+        if self.ALGORITHM == PRA_LRU:
+            for _key_ in self.slot.keys():
+                print( self.slot[_key_] )
+            print("\033[93mTIME UPDATED\033[0m")
+            if FLAG:
+                print("\033[92mREPLACED\033[0m")
+            else:
+                print("\033[94mALREADY EXIST\033[0m")
+            print("ADRESS: {}".format(adress))
+        else:
+            for slot in self.slot:
+                print( slot )
+            if FLAG:
+                print("\033[92mREPLACED\033[0m")
+            else:
+                print("\033[94mALREADY EXIST\033[0m")
+            print("ADRESS: {}".format(adress))
+
+
+
+        print("\n") 
+
+    #{{{
 
 #------------------------------------------------------------------------------------------------#
 
@@ -209,14 +304,8 @@ class Memory(object) :
         print("""\033[96mArquivo de entrada {}\nTamanho da memória {} KB\nTamanho da página: {} KB
 Tecnica de reposição: {}\nPáginas lidas: {}\nPáginas escritas: {}\nAcessos a memória: {}
 Page faults: {}\033[0m""".format( self.filename, self.m_size, self.page, self.ALGORITHM.upper(),
-            self.Rop, self.Wop, 40, self.pg_fault ) )
+            self.Rop, self.Wop, self.access_count, self.pg_fault ) )
         print('------------------------------------------')
 
-        if self.ALGORITHM == PRA_LRU:
-            for _key_ in self.slot.keys():
-                print( self.slot[_key_] )
-        else:
-            for slot in self.slot:
-                print( slot )
-
    #}}}
+

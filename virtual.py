@@ -40,6 +40,3 @@ CACHE = VIRTUAL.parser( filepath )
 VIRTUAL.simulate( CACHE )
 
 VIRTUAL.report()
-
-print(CACHE)
-

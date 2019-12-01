@@ -7,7 +7,7 @@ def processing_args( lista, filename, page_size, memory_size, PRA ) :
     "Processing arguments"
 
     if( len(lista) < 5 or len(lista) > 5 ):
-        print("""Argumentos inválidos! Por favor informe na seguinte ordem:
+        print("""\033[91mArgumentos inválidos! Por favor informe na seguinte ordem:\033[0m
 
 \033[34m<algoritmo_de_substituição>:\033[0m
 least recently used - 'lru'
