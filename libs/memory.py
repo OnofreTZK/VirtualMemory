@@ -247,7 +247,7 @@ class Memory(object) :
                     self.printer(True, CACHE[i])
                 else:
                     #print memory status in terminal
-                    self.printer(False, CACHE[I])
+                    self.printer(False, CACHE[i])
                     continue
 
 
